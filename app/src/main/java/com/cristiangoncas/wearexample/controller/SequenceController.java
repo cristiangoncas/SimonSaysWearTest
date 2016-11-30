@@ -1,18 +1,17 @@
 package com.cristiangoncas.wearexample.controller;
 
 import com.cristiangoncas.wearexample.R;
+import com.cristiangoncas.wearexample.config.Constants;
+import com.cristiangoncas.wearexample.model.SequenceModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SequenceController {
 
-    private final static int Min_LEVEL = 1;
-    private final static int MAX_LEVEL = 100;
-
     private int currentLevel;
 
-    static List<Integer> arrayBtn = new ArrayList<>();
+    private final static List<Integer> arrayBtn = new ArrayList<>();
 
     static {
         arrayBtn.add(0, R.id.yellow);
@@ -25,20 +24,31 @@ public class SequenceController {
         currentLevel = 1;
     }
 
+    public int getCurrentLevel() {
+        return currentLevel;
+    }
+
     public void upLevel() {
-        currentLevel++;
+        if (currentLevel < Constants.MAX_LEVEL)
+            currentLevel++;
     }
 
     public void downLevel() {
-        currentLevel--;
+        if (currentLevel > Constants.MIN_LEVEL)
+            currentLevel--;
     }
 
     private int generateRandomBtn() {
         return (int) (Math.random() * (3 + 1));
     }
 
-    private void generateSequence() {
-
+    public SequenceModel generateSequence() {
+        SequenceModel sequence = new SequenceModel();
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < (currentLevel + 3); i++) {
+            list.add(i, arrayBtn.get(generateRandomBtn()));
+        }
+        sequence.setBtnSequence(list);
+        return sequence;
     }
-
 }

@@ -2,74 +2,58 @@ package com.cristiangoncas.wearexample;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
 import android.support.wearable.activity.WearableActivity;
+import android.support.wearable.view.CircularButton;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.cristiangoncas.wearexample.config.Constants;
+import com.cristiangoncas.wearexample.controller.SequenceController;
+import com.cristiangoncas.wearexample.model.SequenceModel;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends WearableActivity implements View.OnClickListener {
 
-    Button yellow, red, green, blue, decrease, increase, start;
-    TextView level;
+    private Button yellow, red, green, blue, start;
+    private CircularButton decrease, increase;
+    private TextView level;
+    private LinearLayout controls;
 
-    private final int BRIGHT_VALUE = 1000;
-    private final int INTERVAL_VALUE = 1500;
+    private final Handler handler = new Handler();
 
-    private Handler handler = new Handler();
+    private SequenceController sequenceController;
 
-    int levelNumber = 1;
-
-    static Map<String, Integer> lightColors = new HashMap<>();
+    final static Map<String, Integer> lightColors = new HashMap<>();
 
     static {
-        lightColors.put("yellow", R.color.yellow_light);
-        lightColors.put("red", R.color.red_light);
-        lightColors.put("green", R.color.green_light);
-        lightColors.put("blue", R.color.blue_light);
+        lightColors.put("yellow", R.drawable.rounded_yellow_light);
+        lightColors.put("red", R.drawable.rounded_red_light);
+        lightColors.put("green", R.drawable.rounded_green_light);
+        lightColors.put("blue", R.drawable.rounded_blue_light);
     }
 
-    static Map<String, Integer> brightColors = new HashMap<>();
+    final static Map<String, Integer> brightColors = new HashMap<>();
 
     static {
-        brightColors.put("yellow", R.color.yellow);
-        brightColors.put("red", R.color.red);
-        brightColors.put("green", R.color.green);
-        brightColors.put("blue", R.color.blue);
-    }
-
-    static List<Integer> sequence1 = new ArrayList<>();
-
-    static {
-        sequence1.add(0, R.id.yellow);
-        sequence1.add(1, R.id.blue);
-        sequence1.add(2, R.id.green);
-        sequence1.add(3, R.id.red);
-        sequence1.add(4, R.id.red);
-        sequence1.add(5, R.id.blue);
-        sequence1.add(6, R.id.yellow);
-        sequence1.add(7, R.id.green);
-        sequence1.add(8, R.id.yellow);
-        sequence1.add(9, R.id.blue);
-        sequence1.add(10, R.id.red);
-        sequence1.add(11, R.id.green);
-        sequence1.add(12, R.id.yellow);
-        sequence1.add(13, R.id.red);
-        sequence1.add(14, R.id.green);
-        sequence1.add(15, R.id.yellow);
+        brightColors.put("yellow", R.drawable.rounded_yellow);
+        brightColors.put("red", R.drawable.rounded_red);
+        brightColors.put("green", R.drawable.rounded_green);
+        brightColors.put("blue", R.drawable.rounded_blue);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        setAmbientEnabled();
 
+        sequenceController = new SequenceController();
+
+        controls = (LinearLayout) findViewById(R.id.controls);
         yellow = (Button) findViewById(R.id.yellow);
         yellow.setOnClickListener(this);
         red = (Button) findViewById(R.id.red);
@@ -78,65 +62,40 @@ public class MainActivity extends WearableActivity implements View.OnClickListen
         green.setOnClickListener(this);
         blue = (Button) findViewById(R.id.blue);
         blue.setOnClickListener(this);
-        decrease = (Button) findViewById(R.id.decrease_level);
+        decrease = (CircularButton) findViewById(R.id.decrease_level);
         decrease.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (levelNumber > 1) {
-                    levelNumber--;
-                    level.setText(String.valueOf(levelNumber));
-                }
-                if (levelNumber <= 1) {
-                    decrease.setEnabled(false);
-                }
-                if (levelNumber < 100) {
-                    increase.setEnabled(true);
+                int currentLevel = sequenceController.getCurrentLevel();
+                if (currentLevel > Constants.MIN_LEVEL) {
+                    sequenceController.downLevel();
+                    currentLevel = sequenceController.getCurrentLevel();
+                    level.setText(String.valueOf(currentLevel));
                 }
             }
         });
-        increase = (Button) findViewById(R.id.increase_level);
+        increase = (CircularButton) findViewById(R.id.increase_level);
         increase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (levelNumber < 10) {
-                    levelNumber++;
-                    level.setText(String.valueOf(levelNumber));
-                }
-                if (levelNumber >= 10) {
-                    increase.setEnabled(false);
-                }
-                if (levelNumber > 1) {
-                    decrease.setEnabled(true);
+                int currentLevel = sequenceController.getCurrentLevel();
+                if (currentLevel < Constants.MAX_LEVEL) {
+                    sequenceController.upLevel();
+                    currentLevel = sequenceController.getCurrentLevel();
+                    level.setText(String.valueOf(currentLevel));
                 }
             }
         });
         level = (TextView) findViewById(R.id.level);
-        level.setText(String.valueOf(levelNumber));
-        start = (Button) findViewById(R.id.color);
+        level.setText(String.valueOf(sequenceController.getCurrentLevel()));
+        start = (Button) findViewById(R.id.start);
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                view.setEnabled(false);
-                decrease.setEnabled(false);
-                increase.setEnabled(false);
+                controls.setVisibility(View.GONE);
                 executeSequence();
             }
         });
-    }
-
-    @Override
-    public void onEnterAmbient(Bundle ambientDetails) {
-        super.onEnterAmbient(ambientDetails);
-    }
-
-    @Override
-    public void onUpdateAmbient() {
-        super.onUpdateAmbient();
-    }
-
-    @Override
-    public void onExitAmbient() {
-        super.onExitAmbient();
     }
 
     @Override
@@ -144,52 +103,91 @@ public class MainActivity extends WearableActivity implements View.OnClickListen
     }
 
     private void executeSequence() {
+        final SequenceModel sequence = sequenceController.generateSequence();
+        final int currentLevel = sequenceController.getCurrentLevel();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                int brightTime = BRIGHT_VALUE / levelNumber;
-                int betweenColorTime = INTERVAL_VALUE / levelNumber;
+//                int brightTime = BRIGHT_VALUE / currentLevel;
+                int brightTime = 400;
+                if (currentLevel > 45) {
+                    brightTime = 40;
+                } else if (currentLevel > 40) {
+                    brightTime = 60;
+                } else if (currentLevel > 35) {
+                    brightTime = 80;
+                } else if (currentLevel > 24) {
+                    brightTime = 100;
+                } else if (currentLevel > 23) {
+                    brightTime = 150;
+                } else if (currentLevel > 22) {
+                    brightTime = 200;
+                } else if (currentLevel > 21) {
+                    brightTime = 250;
+                } else if (currentLevel > 20) {
+                    brightTime = 250;
+                } else if (currentLevel > 15) {
+                    brightTime = 290;
+                } else if (currentLevel > 10) {
+                    brightTime = 350;
+                } else if (currentLevel > 5) {
+                    brightTime = 450;
+                }
+
+                Log.i("Wear", "Current level: " + currentLevel + " Bright time: " + brightTime);
+                boolean isFirst = true;
                 try {
-                    for (int id : sequence1) {
+                    for (int id : sequence.getBtnSequence()) {
+                        if (!isFirst) {
+                            Thread.sleep(brightTime);
+                        } else {
+                            isFirst = false;
+                        }
                         switch (id) {
                             case R.id.yellow:
                                 changeColor(yellow, getBrightColor("yellow"));
                                 Thread.sleep(brightTime);
-                                changeColor(yellow, getLightColor("yellow"));
                                 break;
                             case R.id.red:
                                 changeColor(red, getBrightColor("red"));
                                 Thread.sleep(brightTime);
-                                changeColor(red, getLightColor("red"));
                                 break;
                             case R.id.green:
                                 changeColor(green, getBrightColor("green"));
                                 Thread.sleep(brightTime);
-                                changeColor(green, getLightColor("green"));
                                 break;
                             case R.id.blue:
                                 changeColor(blue, getBrightColor("blue"));
                                 Thread.sleep(brightTime);
-                                changeColor(blue, getLightColor("blue"));
                                 break;
                         }
-                        Thread.sleep(betweenColorTime);
+                        changeColor(yellow, getLightColor("yellow"));
+                        changeColor(red, getLightColor("red"));
+                        changeColor(green, getLightColor("green"));
+                        changeColor(blue, getLightColor("blue"));
                     }
+                    enableControls();
                 } catch (InterruptedException e) {
-
+                    // Ignoring exception
                 }
             }
         }).start();
-        start.setEnabled(true);
-        decrease.setEnabled(true);
-        increase.setEnabled(true);
     }
 
-    public void changeColor(final View button, final int color) {
+    private void changeColor(final View button, final int drawable) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                button.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), color));
+                button.setBackground(getDrawable(drawable));
+            }
+        });
+    }
+
+    private void enableControls() {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                controls.setVisibility(View.VISIBLE);
             }
         });
     }
