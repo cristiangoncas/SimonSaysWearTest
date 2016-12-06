@@ -14,19 +14,24 @@ import com.cristiangoncas.wearexample.config.Constants;
 import com.cristiangoncas.wearexample.controller.SequenceController;
 import com.cristiangoncas.wearexample.model.SequenceModel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends WearableActivity implements View.OnClickListener {
 
-    private Button yellow, red, green, blue, start;
-    private CircularButton decrease, increase;
-    private TextView level;
+    private Button yellow, red, green, blue;
+    private TextView level, msg;
     private LinearLayout controls;
 
     private final Handler handler = new Handler();
 
     private SequenceController sequenceController;
+
+    private boolean capturingUserSequence = false;
+    private List<Integer> currentSequence = new ArrayList<>();
+    private List<Integer> userSequence = new ArrayList<>();
 
     final static Map<String, Integer> lightColors = new HashMap<>();
 
@@ -62,7 +67,7 @@ public class MainActivity extends WearableActivity implements View.OnClickListen
         green.setOnClickListener(this);
         blue = (Button) findViewById(R.id.blue);
         blue.setOnClickListener(this);
-        decrease = (CircularButton) findViewById(R.id.decrease_level);
+        CircularButton decrease = (CircularButton) findViewById(R.id.decrease_level);
         decrease.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,7 +79,7 @@ public class MainActivity extends WearableActivity implements View.OnClickListen
                 }
             }
         });
-        increase = (CircularButton) findViewById(R.id.increase_level);
+        CircularButton increase = (CircularButton) findViewById(R.id.increase_level);
         increase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,7 +93,8 @@ public class MainActivity extends WearableActivity implements View.OnClickListen
         });
         level = (TextView) findViewById(R.id.level);
         level.setText(String.valueOf(sequenceController.getCurrentLevel()));
-        start = (Button) findViewById(R.id.start);
+        msg = (TextView) findViewById(R.id.msg);
+        Button start = (Button) findViewById(R.id.start);
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,15 +106,40 @@ public class MainActivity extends WearableActivity implements View.OnClickListen
 
     @Override
     public void onClick(View view) {
+        if (!capturingUserSequence) {
+            // TODO: Failed
+        } else if (userSequence.size() < currentSequence.size()) {
+            if (view.getId() == currentSequence.get(userSequence.size())) {
+                msg.setVisibility(View.GONE);
+                userSequence.add(view.getId());
+            } else {
+                msg.setText("Wrong!");
+                msg.setVisibility(View.VISIBLE);
+                msg.setTextColor(getResources().getColor(R.color.red));
+                capturingUserSequence = false;
+                disableColorButtons();
+                enableControls();
+                userSequence = new ArrayList<>();
+            }
+        }
+
+        if (userSequence.size() == currentSequence.size()) {
+            msg.setText("Congratz!");
+            msg.setTextColor(getResources().getColor(R.color.green));
+            msg.setVisibility(View.VISIBLE);
+            disableColorButtons();
+            enableControls();
+            userSequence = new ArrayList<>();
+        }
     }
 
     private void executeSequence() {
         final SequenceModel sequence = sequenceController.generateSequence();
+        currentSequence = sequence.getBtnSequence();
         final int currentLevel = sequenceController.getCurrentLevel();
         new Thread(new Runnable() {
             @Override
             public void run() {
-//                int brightTime = BRIGHT_VALUE / currentLevel;
                 int brightTime = 400;
                 if (currentLevel > 45) {
                     brightTime = 40;
@@ -134,10 +165,9 @@ public class MainActivity extends WearableActivity implements View.OnClickListen
                     brightTime = 450;
                 }
 
-                Log.i("Wear", "Current level: " + currentLevel + " Bright time: " + brightTime);
                 boolean isFirst = true;
                 try {
-                    for (int id : sequence.getBtnSequence()) {
+                    for (int id : currentSequence) {
                         if (!isFirst) {
                             Thread.sleep(brightTime);
                         } else {
@@ -146,18 +176,22 @@ public class MainActivity extends WearableActivity implements View.OnClickListen
                         switch (id) {
                             case R.id.yellow:
                                 changeColor(yellow, getBrightColor("yellow"));
+                                Log.i("Wear", "Yellow");
                                 Thread.sleep(brightTime);
                                 break;
                             case R.id.red:
                                 changeColor(red, getBrightColor("red"));
+                                Log.i("Wear", "Red");
                                 Thread.sleep(brightTime);
                                 break;
                             case R.id.green:
                                 changeColor(green, getBrightColor("green"));
+                                Log.i("Wear", "Green");
                                 Thread.sleep(brightTime);
                                 break;
                             case R.id.blue:
                                 changeColor(blue, getBrightColor("blue"));
+                                Log.i("Wear", "Blue");
                                 Thread.sleep(brightTime);
                                 break;
                         }
@@ -166,7 +200,7 @@ public class MainActivity extends WearableActivity implements View.OnClickListen
                         changeColor(green, getLightColor("green"));
                         changeColor(blue, getLightColor("blue"));
                     }
-                    enableControls();
+                    enableColorButtons();
                 } catch (InterruptedException e) {
                     // Ignoring exception
                 }
@@ -198,5 +232,30 @@ public class MainActivity extends WearableActivity implements View.OnClickListen
 
     private int getBrightColor(String color) {
         return brightColors.get(color);
+    }
+
+    private void enableColorButtons() {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                capturingUserSequence = true;
+                yellow.setEnabled(true);
+                red.setEnabled(true);
+                green.setEnabled(true);
+                blue.setEnabled(true);
+            }
+        });
+    }
+
+    private void disableColorButtons() {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                yellow.setEnabled(false);
+                red.setEnabled(false);
+                green.setEnabled(false);
+                blue.setEnabled(false);
+            }
+        });
     }
 }

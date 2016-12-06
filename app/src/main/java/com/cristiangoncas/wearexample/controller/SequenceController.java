@@ -10,7 +10,6 @@ import java.util.List;
 public class SequenceController {
 
     private int currentLevel;
-
     private final static List<Integer> arrayBtn = new ArrayList<>();
 
     static {
@@ -51,4 +50,7 @@ public class SequenceController {
         sequence.setBtnSequence(list);
         return sequence;
     }
+
+
+
 }

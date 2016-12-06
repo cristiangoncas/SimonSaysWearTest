@@ -15,7 +15,7 @@
             android:layout_width="140dp"
             android:layout_height="40dp"
             android:layout_gravity="top|center_horizontal"
-            android:background="@drawable/rounded_yellow_light"
+            android:background="@drawable/selector_yellow"
             android:enabled="false"/>
 
     <Button
@@ -23,7 +23,7 @@
             android:layout_width="40dp"
             android:layout_height="140dp"
             android:layout_gravity="start|center_vertical"
-            android:background="@drawable/rounded_red_light"
+            android:background="@drawable/selector_red"
             android:layout_marginTop="8dp"
             android:enabled="false"/>
 
@@ -33,7 +33,7 @@
             android:layout_height="140dp"
             android:layout_marginTop="8dp"
             android:layout_gravity="end|center_vertical"
-            android:background="@drawable/rounded_green_light"
+            android:background="@drawable/selector_green"
             android:enabled="false"/>
 
     <Button
@@ -42,8 +42,19 @@
             android:layout_height="55dp"
             android:layout_marginBottom="-25dp"
             android:layout_gravity="bottom|center_horizontal"
-            android:background="@drawable/rounded_blue_light"
+            android:background="@drawable/selector_blue"
             android:enabled="false"/>
+
+    <TextView
+            android:id="@+id/msg"
+            android:layout_width="100dp"
+            android:layout_height="35dp"
+            android:textColor="@color/red"
+            android:textStyle="bold"
+            android:paddingTop="10dp"
+            android:layout_gravity="center"
+            android:textSize="8pt"
+            android:visibility="gone"/>
 
     <LinearLayout
             android:id="@+id/controls"
@@ -77,6 +88,7 @@
                     android:textSize="8pt"
                     android:layout_toEndOf="@+id/decrease_level"/>
 
+
             <android.support.wearable.view.CircularButton
                     android:id="@+id/increase_level"
                     android:layout_width="35dp"
@@ -85,6 +97,7 @@
                     android:src="@mipmap/plus"/>
         </LinearLayout>
 
+
         <Button
                 android:id="@+id/start"
                 android:layout_width="wrap_content"
@@ -92,5 +105,4 @@
                 android:text="@string/txt_start"/>
 
     </LinearLayout>
-
 </android.support.wearable.view.BoxInsetLayout>
