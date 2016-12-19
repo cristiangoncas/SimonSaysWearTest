@@ -1,4 +1,4 @@
-package com.cristiangoncas.wearexample;
+package com.cristiangoncas.simonsays;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,9 +10,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.cristiangoncas.wearexample.config.Constants;
-import com.cristiangoncas.wearexample.controller.SequenceController;
-import com.cristiangoncas.wearexample.model.SequenceModel;
+import com.cristiangoncas.simonsays.config.Constants;
+import com.cristiangoncas.simonsays.controller.SequenceController;
+import com.cristiangoncas.simonsays.model.SequenceModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,9 +21,9 @@ import java.util.Map;
 
 public class MainActivity extends WearableActivity implements View.OnClickListener {
 
-    private Button yellow, red, green, blue;
+    private Button yellow, red, green, blue, retry;
     private TextView level, msg;
-    private LinearLayout controls;
+    private LinearLayout controls, retryMsg;
 
     private final Handler handler = new Handler();
 
@@ -59,6 +59,7 @@ public class MainActivity extends WearableActivity implements View.OnClickListen
         sequenceController = new SequenceController();
 
         controls = (LinearLayout) findViewById(R.id.controls);
+        retryMsg = (LinearLayout) findViewById(R.id.retry);
         yellow = (Button) findViewById(R.id.yellow);
         yellow.setOnClickListener(this);
         red = (Button) findViewById(R.id.red);
@@ -67,6 +68,15 @@ public class MainActivity extends WearableActivity implements View.OnClickListen
         green.setOnClickListener(this);
         blue = (Button) findViewById(R.id.blue);
         blue.setOnClickListener(this);
+        retry = (Button) findViewById(R.id.retry_btn);
+        retry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                enableControls();
+                userSequence = new ArrayList<>();
+                retryMsg.setVisibility(View.GONE);
+            }
+        });
         CircularButton decrease = (CircularButton) findViewById(R.id.decrease_level);
         decrease.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,31 +115,66 @@ public class MainActivity extends WearableActivity implements View.OnClickListen
     }
 
     @Override
-    public void onClick(View view) {
+    public void onClick(final View view) {
+        switch (view.getId()) {
+            case R.id.yellow:
+                changeColor(view, getBrightColor("yellow"));
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        changeColor(view, getLightColor("yellow"));
+                    }
+                }, 200);
+                break;
+            case R.id.red:
+                changeColor(view, getBrightColor("red"));
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        changeColor(view, getLightColor("red"));
+                    }
+                }, 200);
+                break;
+            case R.id.green:
+                changeColor(view, getBrightColor("green"));
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        changeColor(view, getLightColor("green"));
+                    }
+                }, 200);
+                break;
+            case R.id.blue:
+                changeColor(view, getBrightColor("blue"));
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        changeColor(view, getLightColor("blue"));
+                    }
+                }, 200);
+                break;
+        }
+
         if (!capturingUserSequence) {
             // TODO: Failed
         } else if (userSequence.size() < currentSequence.size()) {
             if (view.getId() == currentSequence.get(userSequence.size())) {
-                msg.setVisibility(View.GONE);
+                retryMsg.setVisibility(View.GONE);
                 userSequence.add(view.getId());
             } else {
-                msg.setText("Wrong!");
-                msg.setVisibility(View.VISIBLE);
-                msg.setTextColor(getResources().getColor(R.color.red));
-                capturingUserSequence = false;
                 disableColorButtons();
-                enableControls();
-                userSequence = new ArrayList<>();
+                msg.setText("Wrong!");
+                msg.setTextColor(getResources().getColor(R.color.red));
+                retryMsg.setVisibility(View.VISIBLE);
+                capturingUserSequence = false;
             }
         }
 
         if (userSequence.size() == currentSequence.size()) {
+            disableColorButtons();
             msg.setText("Congratz!");
             msg.setTextColor(getResources().getColor(R.color.green));
-            msg.setVisibility(View.VISIBLE);
-            disableColorButtons();
-            enableControls();
-            userSequence = new ArrayList<>();
+            retryMsg.setVisibility(View.VISIBLE);
         }
     }
 

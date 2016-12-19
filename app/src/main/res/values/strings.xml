@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">WearExample</string>
+    <string name="app_name">Simon Says</string>
     <string name="hello_world">Hello World!</string>
     <string name="plus_symbol">+</string>
     <string name="minus_symbol">-</string>

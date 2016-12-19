@@ -7,7 +7,7 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
         android:background="@color/black"
-        tools:context="com.cristiangoncas.wearexample.MainActivity"
+        tools:context="com.cristiangoncas.simonsays.MainActivity"
         tools:deviceIds="wear">
 
     <Button
@@ -45,16 +45,31 @@
             android:background="@drawable/selector_blue"
             android:enabled="false"/>
 
-    <TextView
-            android:id="@+id/msg"
-            android:layout_width="100dp"
-            android:layout_height="35dp"
-            android:textColor="@color/red"
-            android:textStyle="bold"
-            android:paddingTop="10dp"
-            android:layout_gravity="center"
-            android:textSize="8pt"
-            android:visibility="gone"/>
+    <LinearLayout
+            android:id="@+id/retry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_gravity="center">
+
+
+        <TextView
+                android:id="@+id/msg"
+                android:layout_width="100dp"
+                android:layout_height="35dp"
+                android:textColor="@color/red"
+                android:textStyle="bold"
+                android:paddingTop="10dp"
+                android:textSize="8pt"/>
+
+        <Button
+                android:id="@+id/retry_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Retry"/>
+
+    </LinearLayout>
 
     <LinearLayout
             android:id="@+id/controls"

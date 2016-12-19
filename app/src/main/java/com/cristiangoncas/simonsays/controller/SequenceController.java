@@ -1,8 +1,8 @@
-package com.cristiangoncas.wearexample.controller;
+package com.cristiangoncas.simonsays.controller;
 
-import com.cristiangoncas.wearexample.R;
-import com.cristiangoncas.wearexample.config.Constants;
-import com.cristiangoncas.wearexample.model.SequenceModel;
+import com.cristiangoncas.simonsays.R;
+import com.cristiangoncas.simonsays.config.Constants;
+import com.cristiangoncas.simonsays.model.SequenceModel;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.cristiangoncas.wearexample.model;
+package com.cristiangoncas.simonsays.model;
 
 import java.util.List;
 

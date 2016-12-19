@@ -1,4 +1,4 @@
-package com.cristiangoncas.wearexample.config;
+package com.cristiangoncas.simonsays.config;
 
 public class Constants {
 
