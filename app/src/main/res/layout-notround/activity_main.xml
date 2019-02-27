@@ -12,79 +12,113 @@
 
     <Button
             android:id="@+id/yellow"
-            android:layout_width="135dp"
-            android:layout_height="45dp"
+            android:layout_width="140dp"
+            android:layout_height="40dp"
             android:layout_gravity="top|center_horizontal"
-            android:background="@drawable/rounded_yellow_light"
-            android:layout_marginTop="-10dp"
+            android:background="@drawable/selector_yellow"
             android:enabled="false"/>
 
     <Button
             android:id="@+id/red"
-            android:layout_width="45dp"
-            android:layout_height="135dp"
+            android:layout_width="40dp"
+            android:layout_height="140dp"
             android:layout_gravity="start|center_vertical"
-            android:background="@drawable/rounded_red_light"
-            android:layout_marginStart="-10dp"
+            android:background="@drawable/selector_red"
+            android:layout_marginTop="8dp"
             android:enabled="false"/>
 
     <Button
             android:id="@+id/green"
-            android:layout_width="45dp"
-            android:layout_height="135dp"
+            android:layout_width="40dp"
+            android:layout_height="140dp"
+            android:layout_marginTop="8dp"
             android:layout_gravity="end|center_vertical"
-            android:background="@drawable/rounded_green_light"
-            android:layout_marginEnd="-10dp"
+            android:background="@drawable/selector_green"
             android:enabled="false"/>
 
     <Button
             android:id="@+id/blue"
-            android:layout_width="135dp"
-            android:layout_height="45dp"
-            android:layout_marginBottom="-10dp"
+            android:layout_width="140dp"
+            android:layout_height="55dp"
+            android:layout_marginBottom="-25dp"
             android:layout_gravity="bottom|center_horizontal"
-            android:background="@drawable/rounded_blue_light"
+            android:background="@drawable/selector_blue"
             android:enabled="false"/>
 
     <LinearLayout
+            android:id="@+id/retry"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:visibility="gone"
             android:layout_gravity="center">
 
-        <LinearLayout
+
+        <TextView
+                android:id="@+id/msg"
+                android:layout_width="100dp"
+                android:layout_height="35dp"
+                android:textColor="@color/red"
+                android:textStyle="bold"
+                android:paddingTop="10dp"
+                android:textSize="8pt"/>
+
+        <Button
+                android:id="@+id/retry_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_horizontal">
+                android:text="Retry"/>
 
-            <Button
+    </LinearLayout>
+
+    <LinearLayout
+            android:id="@+id/controls"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="10dp">
+
+            <android.support.wearable.view.CircularButton
                     android:id="@+id/decrease_level"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:enabled="false"
-                    android:text="@string/minus_symbol"/>
+                    android:src="@mipmap/minus"/>
 
             <TextView
                     android:id="@+id/level"
-                    android:layout_width="30dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center_horizontal"/>
+                    android:layout_width="45dp"
+                    android:layout_height="35dp"
+                    android:textColor="@color/white"
+                    android:paddingTop="10dp"
+                    android:gravity="center_horizontal"
+                    android:textSize="8pt"
+                    android:layout_toEndOf="@+id/decrease_level"/>
 
-            <Button
+
+            <android.support.wearable.view.CircularButton
                     android:id="@+id/increase_level"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:text="@string/plus_symbol"/>
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_toEndOf="@+id/level"
+                    android:src="@mipmap/plus"/>
         </LinearLayout>
 
+
         <Button
-                android:id="@+id/color"
+                android:id="@+id/start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:text="@string/txt_start"/>
+
     </LinearLayout>
 
 </android.support.wearable.view.BoxInsetLayout>
